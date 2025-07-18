@@ -4,9 +4,10 @@ import type React from "react"
 import { createContext, useContext, useEffect, useState, useRef } from "react"
 import { supabase } from "@/lib/supabase-client"
 import { useAuth } from "@/contexts/auth-context"
-import { useToast } from "@/hooks/use-toast"
 import { useNotifications } from "@/contexts/notifications-context"
-import { useSettings } from "@/contexts/settings-context"
+import { useToast } from "@/hooks/use-toast"
+import { useExpenses } from "@/contexts/expenses-context"
+import { useCategories } from "@/contexts/categories-context"
 
 // Define Budget types here to avoid circular imports
 export interface Budget {
@@ -77,188 +78,38 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
   const [budgets, setBudgets] = useState<BudgetWithDetails[]>([])
   const [loading, setLoading] = useState(false)
   const { user } = useAuth()
-  const { toast } = useToast()
   const { addNotification } = useNotifications()
-  const { settings } = useSettings()
+  const { toast } = useToast()
 
-  // Track which budgets we've already shown notifications for (in-app alerts)
+  // Remove these lines:
+  // const expensesContext = useExpenses()
+  // const categoriesContext = useCategories()
+  // const expenses = expensesContext?.expenses || []
+  // const categories = categoriesContext?.categories || []
+
+  // Replace with this safer approach:
+  let expenses: any[] = []
+  let categories: any[] = []
+
+  // Safely get expenses and categories
+  try {
+    const expensesContext = useExpenses()
+    expenses = expensesContext?.expenses || []
+  } catch (error) {
+    console.log("Expenses context not available, using empty array")
+    expenses = []
+  }
+
+  try {
+    const categoriesContext = useCategories()
+    categories = categoriesContext?.categories || []
+  } catch (error) {
+    console.log("Categories context not available, using empty array")
+    categories = []
+  }
+
+  // Track which budgets we've already shown notifications for
   const notifiedBudgetsRef = useRef<Record<string, { overBudget: boolean; nearLimit: boolean }>>({})
-
-  // Track email notifications sent today per CATEGORY using localStorage
-  const getEmailNotificationState = () => {
-    try {
-      const saved = localStorage.getItem("budgetEmailNotifications")
-      return saved ? JSON.parse(saved) : {}
-    } catch {
-      return {}
-    }
-  }
-
-  const saveEmailNotificationState = (state: any) => {
-    try {
-      localStorage.setItem("budgetEmailNotifications", JSON.stringify(state))
-    } catch (error) {
-      console.error("Error saving email state:", error)
-    }
-  }
-
-  // Helper function to send email notification
-  const sendEmailNotification = async (type: string, data: any) => {
-    if (!settings?.notifications?.emailNotifications || !user?.email) {
-      console.log("Email notifications disabled or no user email")
-      return
-    }
-
-    try {
-      console.log("Sending email notification:", type, "to:", user.email)
-      const response = await fetch("/api/send-notification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type,
-          data,
-          userEmail: user.email,
-        }),
-      })
-
-      const result = await response.json()
-      console.log("Email notification result:", result)
-    } catch (error) {
-      console.error("Failed to send email notification:", error)
-    }
-  }
-
-  // Helper function to get expenses for a budget directly from the database
-  const getExpensesForBudget = async (budget: Budget, periodStart: Date, periodEnd: Date) => {
-    if (!user) return []
-
-    try {
-      console.log("=== BUDGET CALCULATION DEBUG ===")
-      console.log("Budget:", budget.name, "Category ID:", budget.category_id)
-      console.log("Period:", periodStart.toISOString().split("T")[0], "to", periodEnd.toISOString().split("T")[0])
-      console.log("User ID:", user.id)
-
-      // Make sure we're only getting expenses with valid dates in the current period
-      const { data, error } = await supabase
-        .from("expenses")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("category_id", budget.category_id)
-        .gte("date", periodStart.toISOString().split("T")[0])
-        .lte("date", periodEnd.toISOString().split("T")[0])
-        // Add additional filter to exclude future dates beyond today
-        .lte("date", new Date().toISOString().split("T")[0])
-
-      if (error) {
-        console.error("Error fetching expenses for budget:", error)
-        return []
-      }
-
-      console.log("Found expenses for budget:", data?.length || 0)
-      console.log(
-        "Expenses details:",
-        data?.map((exp) => ({
-          id: exp.id,
-          amount: exp.amount,
-          date: exp.date,
-          created_at: exp.created_at,
-          category_id: exp.category_id,
-          description: exp.description,
-        })),
-      )
-
-      // Filter out any expenses with invalid or future dates
-      const validExpenses = (data || []).filter((expense) => {
-        const expenseDate = new Date(expense.date)
-        const today = new Date()
-        today.setHours(23, 59, 59, 999) // End of today
-
-        const isValidDate = !isNaN(expenseDate.getTime())
-        const isNotFuture = expenseDate <= today
-        const isInPeriod = expenseDate >= periodStart && expenseDate <= periodEnd
-
-        console.log(
-          `Expense ${expense.id}: date=${expense.date}, valid=${isValidDate}, notFuture=${isNotFuture}, inPeriod=${isInPeriod}`,
-        )
-
-        return isValidDate && isNotFuture && isInPeriod
-      })
-
-      console.log("Valid expenses after filtering:", validExpenses.length)
-
-      return validExpenses
-    } catch (error) {
-      console.error("Error in getExpensesForBudget:", error)
-      return []
-    }
-  }
-
-  // Helper function to get category details for a budget
-  const getCategoryForBudget = async (categoryId: string) => {
-    if (!user || !categoryId) return null
-
-    try {
-      const { data, error } = await supabase.from("categories").select("*").eq("id", categoryId).single()
-
-      if (error) {
-        console.error("Error fetching category for budget:", error)
-        return null
-      }
-
-      return data
-    } catch (error) {
-      console.error("Error in getCategoryForBudget:", error)
-      return null
-    }
-  }
-
-  const shouldSendEmailToday = (categoryId: string, type: "overBudget" | "warning"): boolean => {
-    const today = new Date().toISOString().split("T")[0]
-    const emailState = getEmailNotificationState()
-    const categoryState = emailState[categoryId]
-
-    console.log(`Checking email for category ${categoryId}, type ${type}:`, categoryState)
-
-    if (!categoryState || categoryState.lastEmailDate !== today) {
-      return true
-    }
-
-    if (type === "overBudget" && categoryState.overBudgetEmailSent) {
-      console.log(`Over budget email already sent today for category ${categoryId}`)
-      return false
-    }
-
-    if (type === "warning" && categoryState.warningEmailSent) {
-      console.log(`Warning email already sent today for category ${categoryId}`)
-      return false
-    }
-
-    return true
-  }
-
-  const markEmailAsSent = (categoryId: string, type: "overBudget" | "warning") => {
-    const today = new Date().toISOString().split("T")[0]
-    const emailState = getEmailNotificationState()
-
-    if (!emailState[categoryId]) {
-      emailState[categoryId] = {
-        lastEmailDate: today,
-        overBudgetEmailSent: false,
-        warningEmailSent: false,
-      }
-    }
-
-    if (type === "overBudget") {
-      emailState[categoryId].overBudgetEmailSent = true
-    } else {
-      emailState[categoryId].warningEmailSent = true
-    }
-
-    saveEmailNotificationState(emailState)
-    console.log(`Marked ${type} email as sent for category ${categoryId}`)
-  }
 
   const calculateBudgetProgress = async (budget: Budget): Promise<BudgetWithDetails> => {
     const now = new Date()
@@ -275,128 +126,67 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
       periodEnd = new Date(now.getFullYear(), 11, 31)
     }
 
-    // Get expenses for this budget period
-    const expenses = await getExpensesForBudget(budget, periodStart, periodEnd)
+    // Calculate spent amount for current period using actual expenses
+    const periodExpenses = expenses.filter((expense) => {
+      const expenseDate = new Date(expense.date)
+      const isInPeriod = expenseDate >= periodStart && expenseDate <= periodEnd
+      const isMatchingCategory = expense.category_id === budget.category_id || expense.category === budget.category_id
 
-    // Calculate spent amount with detailed logging
-    console.log("=== CALCULATION DEBUG ===")
-    console.log("Raw expenses:", expenses)
+      return isInPeriod && isMatchingCategory
+    })
 
-    const spentAmount = expenses.reduce((sum, expense) => {
-      const amount = Number.parseFloat(expense.amount)
-      console.log(`Adding expense: ${expense.description || "No description"} - $${amount}`)
-      return sum + amount
-    }, 0)
-
-    console.log("Total calculated spent amount:", spentAmount)
-    console.log("Budget limit:", budget.amount)
-
+    const spentAmount = periodExpenses.reduce((sum, expense) => sum + expense.amount, 0)
     const remainingAmount = budget.amount - spentAmount
     const percentageUsed = budget.amount > 0 ? (spentAmount / budget.amount) * 100 : 0
-
-    // Get thresholds from settings
-    const alertThreshold = settings?.budgetAlerts?.alertThreshold || budget.alert_threshold || 80
-    const criticalThreshold = settings?.budgetAlerts?.criticalThreshold || 95
-
     const isOverBudget = spentAmount > budget.amount
-    const isNearLimit = percentageUsed >= alertThreshold && !isOverBudget
+    const isNearLimit = percentageUsed >= budget.alert_threshold && !isOverBudget
 
     // Find category details
-    const category = await getCategoryForBudget(budget.category_id)
+    const category = categories.find((c) => c.id === budget.category_id)
 
     // Check if we need to show notifications
     const notificationState = notifiedBudgetsRef.current[budget.id] || { overBudget: false, nearLimit: false }
 
-    // Check if notifications are enabled in settings
-    const notificationsEnabled = settings?.notifications?.enabled
-    const budgetAlertsEnabled = settings?.notifications?.budgetAlerts
+    // Only show over budget notification if we haven't shown it before for this budget
+    if (isOverBudget && !notificationState.overBudget) {
+      // Show toast notification
+      toast({
+        title: "Budget Exceeded!",
+        description: `Your ${budget.name} budget has exceeded its limit of $${budget.amount.toFixed(2)}`,
+        variant: "destructive",
+      })
 
-    console.log("=== NOTIFICATION SETTINGS ===")
-    console.log("Notifications enabled:", notificationsEnabled)
-    console.log("Budget alerts enabled:", budgetAlertsEnabled)
-    console.log("Email notifications enabled:", settings?.notifications?.emailNotifications)
+      // Add to notification center
+      addNotification({
+        title: "Budget Exceeded!",
+        message: `Your ${budget.name} budget has exceeded its limit of $${budget.amount.toFixed(2)}`,
+        type: "error",
+        priority: "high",
+      })
 
-    // Only show notifications if they're enabled in settings
-    if (notificationsEnabled && budgetAlertsEnabled) {
-      // Only show over budget notification if we haven't shown it before for this budget
-      if (isOverBudget && !notificationState.overBudget) {
-        // Show toast notification ONLY if push notifications are enabled
-        if (settings?.notifications?.pushNotifications !== false) {
-          toast({
-            title: "Budget Exceeded!",
-            description: `Your ${budget.name} budget has exceeded its limit of $${budget.amount.toFixed(2)}`,
-            variant: "destructive",
-          })
-        }
+      notificationState.overBudget = true
+      notifiedBudgetsRef.current[budget.id] = notificationState
+    }
 
-        // Add to notification center ONLY if notifications are enabled
-        if (settings?.notifications?.enabled) {
-          addNotification({
-            title: "Budget Exceeded!",
-            message: `Your ${budget.name} budget has exceeded its limit of $${budget.amount.toFixed(2)}`,
-            type: "error",
-            priority: "high",
-          })
-        }
+    // Only show near limit notification if we haven't shown it before for this budget
+    if (isNearLimit && !notificationState.nearLimit && !notificationState.overBudget) {
+      // Show toast notification
+      toast({
+        title: "Budget Alert",
+        description: `Your ${budget.name} budget has reached ${percentageUsed.toFixed(0)}% of its limit`,
+        variant: "warning",
+      })
 
-        // Send email notification if enabled and not sent today for this category
-        if (settings?.notifications?.emailNotifications && shouldSendEmailToday(budget.category_id, "overBudget")) {
-          setTimeout(() => {
-            sendEmailNotification("budget_exceeded", {
-              budgetName: budget.name,
-              amount: budget.amount,
-              spentAmount: spentAmount,
-              categoryName: category?.name || "Unknown Category",
-            }).then(() => {
-              markEmailAsSent(budget.category_id, "overBudget")
-            })
-          }, 1000)
-        }
+      // Add to notification center
+      addNotification({
+        title: "Budget Alert",
+        message: `Your ${budget.name} budget has reached ${percentageUsed.toFixed(0)}% of its limit`,
+        type: "warning",
+        priority: "medium",
+      })
 
-        notificationState.overBudget = true
-        notifiedBudgetsRef.current[budget.id] = notificationState
-      }
-
-      // Similar changes for the warning notification section...
-      if (isNearLimit && !notificationState.nearLimit && !notificationState.overBudget) {
-        // Show toast notification ONLY if push notifications are enabled
-        if (settings?.notifications?.pushNotifications !== false) {
-          toast({
-            title: "Budget Alert",
-            description: `Your ${budget.name} budget has reached ${percentageUsed.toFixed(0)}% of its limit`,
-            variant: "warning",
-          })
-        }
-
-        // Add to notification center ONLY if notifications are enabled
-        if (settings?.notifications?.enabled) {
-          addNotification({
-            title: "Budget Alert",
-            message: `Your ${budget.name} budget has reached ${percentageUsed.toFixed(0)}% of its limit`,
-            type: "warning",
-            priority: "medium",
-          })
-        }
-
-        if (settings?.notifications?.emailNotifications && shouldSendEmailToday(budget.category_id, "warning")) {
-          setTimeout(() => {
-            sendEmailNotification("budget_warning", {
-              budgetName: budget.name,
-              amount: budget.amount,
-              spentAmount: spentAmount,
-              percentage: percentageUsed,
-              categoryName: category?.name || "Unknown Category",
-            }).then(() => {
-              markEmailAsSent(budget.category_id, "warning")
-            })
-          }, 2000)
-        }
-
-        notificationState.nearLimit = true
-        notifiedBudgetsRef.current[budget.id] = notificationState
-      }
-    } else {
-      console.log("Notifications disabled in settings - skipping all notifications")
+      notificationState.nearLimit = true
+      notifiedBudgetsRef.current[budget.id] = notificationState
     }
 
     return {
@@ -455,12 +245,13 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
+      // Show toast notification
       toast({
         title: "Budget Created",
         description: `Your ${budgetData.name} budget has been created successfully`,
       })
 
-      // Add notification for budget creation
+      // Add to notification center
       addNotification({
         title: "Budget Created",
         message: `Your ${budgetData.name} budget has been created successfully`,
@@ -471,11 +262,22 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
       await fetchBudgets()
     } catch (error) {
       console.error("Error adding budget:", error)
+
+      // Show toast notification
       toast({
         title: "Error",
         description: "Failed to create budget. Please try again.",
         variant: "destructive",
       })
+
+      // Add to notification center
+      addNotification({
+        title: "Error",
+        message: "Failed to create budget. Please try again.",
+        type: "error",
+        priority: "high",
+      })
+
       throw error
     }
   }
@@ -497,27 +299,39 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
         notifiedBudgetsRef.current[id] = { overBudget: false, nearLimit: false }
       }
 
+      // Show toast notification
       toast({
         title: "Budget Updated",
         description: "Your budget has been updated successfully",
       })
 
-      // Add notification for budget update
+      // Add to notification center
       addNotification({
         title: "Budget Updated",
         message: "Your budget has been updated successfully",
-        type: "info",
+        type: "success",
         priority: "low",
       })
 
       await fetchBudgets()
     } catch (error) {
       console.error("Error updating budget:", error)
+
+      // Show toast notification
       toast({
         title: "Error",
         description: "Failed to update budget. Please try again.",
         variant: "destructive",
       })
+
+      // Add to notification center
+      addNotification({
+        title: "Error",
+        message: "Failed to update budget. Please try again.",
+        type: "error",
+        priority: "high",
+      })
+
       throw error
     }
   }
@@ -533,19 +347,39 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
         delete notifiedBudgetsRef.current[id]
       }
 
+      // Show toast notification
       toast({
         title: "Budget Deleted",
         description: "Your budget has been deleted successfully",
       })
 
+      // Add to notification center
+      addNotification({
+        title: "Budget Deleted",
+        message: "Your budget has been deleted successfully",
+        type: "success",
+        priority: "low",
+      })
+
       await fetchBudgets()
     } catch (error) {
       console.error("Error deleting budget:", error)
+
+      // Show toast notification
       toast({
         title: "Error",
         description: "Failed to delete budget. Please try again.",
         variant: "destructive",
       })
+
+      // Add to notification center
+      addNotification({
+        title: "Error",
+        message: "Failed to delete budget. Please try again.",
+        type: "error",
+        priority: "high",
+      })
+
       throw error
     }
   }
@@ -569,19 +403,30 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
       notifiedBudgetsRef.current = {}
       localStorage.setItem("lastCheckedBudgetMonth", firstDayOfMonth.toISOString().slice(0, 7))
     }
-
-    // Reset email notifications daily
-    const today = new Date().toISOString().split("T")[0]
-    const lastCheckedDay = localStorage.getItem("lastCheckedEmailDay")
-
-    if (lastCheckedDay !== today) {
-      // Reset email notification state for new day
-      saveEmailNotificationState({})
-      localStorage.setItem("lastCheckedEmailDay", today)
-    }
   }, [])
 
-  // Fetch budgets when user changes
+  // Remove this useEffect:
+  // useEffect(() => {
+  //   if (user && budgets.length > 0) {
+  //     const updateBudgetsWithNewData = async () => {
+  //       const updatedBudgets = await Promise.all(budgets.map((budget) => calculateBudgetProgress(budget)))
+  //       setBudgets(updatedBudgets)
+  //     }
+  //     updateBudgetsWithNewData()
+  //   }
+  // }, [expenses, categories, budgets, user])
+
+  // Replace with this simpler version:
+  useEffect(() => {
+    if (user && budgets.length > 0) {
+      const updateBudgetsWithNewData = async () => {
+        const updatedBudgets = await Promise.all(budgets.map((budget) => calculateBudgetProgress(budget)))
+        setBudgets(updatedBudgets)
+      }
+      updateBudgetsWithNewData()
+    }
+  }, [user])
+
   useEffect(() => {
     if (user) {
       fetchBudgets()

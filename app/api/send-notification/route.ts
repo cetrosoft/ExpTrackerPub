@@ -1,36 +1,27 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { sendEmailNotification, emailTemplates } from "@/lib/email-service"
+import { NextResponse } from "next/server"
+import { Resend } from "resend"
+import { EmailService } from "@/lib/email-service"
 
-export async function POST(request: NextRequest) {
+const resend = new Resend(process.env.RESEND_API_KEY)
+const emailService = new EmailService(resend)
+
+export async function POST(request: Request) {
   try {
-    const { type, data, userEmail } = await request.json()
+    const { to, subject, html } = await request.json()
 
-    if (!userEmail) {
-      return NextResponse.json({ error: "User email is required" }, { status: 400 })
+    if (!to || !subject || !html) {
+      return NextResponse.json({ error: "Missing required fields: to, subject, html" }, { status: 400 })
     }
 
-    let template
-    switch (type) {
-      case "budget_exceeded":
-        template = emailTemplates.budgetExceeded(data.budgetName, data.amount, data.spentAmount)
-        break
-      case "budget_warning":
-        template = emailTemplates.budgetWarning(data.budgetName, data.amount, data.spentAmount, data.percentage)
-        break
-      default:
-        return NextResponse.json({ error: "Invalid notification type" }, { status: 400 })
-    }
-
-    const success = await sendEmailNotification({
-      to: userEmail,
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
+    const data = await emailService.sendEmail({
+      to,
+      subject,
+      html,
     })
 
-    return NextResponse.json({ success })
+    return NextResponse.json(data)
   } catch (error) {
-    console.error("Error in send-notification API:", error)
-    return NextResponse.json({ error: "Failed to send notification" }, { status: 500 })
+    console.error("Error sending notification email:", error)
+    return NextResponse.json({ error: "Failed to send notification email" }, { status: 500 })
   }
 }

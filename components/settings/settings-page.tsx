@@ -26,10 +26,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Download, Upload, Trash2, Globe, Palette, Bell, Database, Info, SettingsIcon, Shield } from "lucide-react"
+import { Download, Upload, Trash2, Globe, Palette, Bell, Database, Info, SettingsIcon } from "lucide-react"
 
 export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: string }) {
-  const { settings, updateSettings, resetSettings, exportSettings, importSettings, loading } = useSettings()
+  const { settings, updateSettings, resetSettings, exportSettings, importSettings } = useSettings()
   const { expenses } = useExpenses()
   const { categories } = useCategories()
   const [importFile, setImportFile] = useState<File | null>(null)
@@ -158,7 +158,7 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
       const data = JSON.parse(text)
 
       if (data.settings) {
-        await importSettings(JSON.stringify(data.settings))
+        importSettings(JSON.stringify(data.settings))
       }
     } catch (error) {
       console.error("Import failed:", error)
@@ -183,16 +183,6 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
     { value: "yyyy_mm_dd", label: dictionary.settings.date_format_options.yyyy_mm_dd },
   ]
 
-  const backupFrequencies = [
-    { value: "daily", label: "Daily" },
-    { value: "weekly", label: "Weekly" },
-    { value: "monthly", label: "Monthly" },
-  ]
-
-  if (loading) {
-    return <div className="flex items-center justify-center p-8">Loading settings...</div>
-  }
-
   return (
     <div className="space-y-6">
       <div className={cn("flex items-center gap-3", isRtl && "flex-row-reverse")}>
@@ -201,14 +191,10 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
       </div>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="general" className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
             {dictionary.settings.general}
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            Notifications
           </TabsTrigger>
           <TabsTrigger value="preferences" className="flex items-center gap-2">
             <Palette className="h-4 w-4" />
@@ -324,18 +310,18 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
           </Card>
         </TabsContent>
 
-        <TabsContent value="notifications" className="space-y-6">
+        <TabsContent value="preferences" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Notification Settings
+                {dictionary.settings.notifications}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="notifications">Enable Notifications</Label>
+                  <Label htmlFor="notifications">{dictionary.settings.enable_notifications}</Label>
                   <p className="text-sm text-muted-foreground">Receive notifications for important events</p>
                 </div>
                 <Switch
@@ -344,8 +330,11 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
                   onCheckedChange={(checked) =>
                     updateSettings({
                       notifications: {
-                        ...settings.notifications,
+                        ...settings?.notifications,
                         enabled: checked,
+                        expenseReminders: settings?.notifications?.expenseReminders || false,
+                        budgetAlerts: settings?.notifications?.budgetAlerts || false,
+                        weeklyReports: settings?.notifications?.weeklyReports || false,
                       },
                     })
                   }
@@ -356,24 +345,7 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="budgetAlerts">Budget Alerts</Label>
-                  <Switch
-                    id="budgetAlerts"
-                    checked={settings?.notifications?.budgetAlerts || false}
-                    disabled={!settings?.notifications?.enabled}
-                    onCheckedChange={(checked) =>
-                      updateSettings({
-                        notifications: {
-                          ...settings.notifications,
-                          budgetAlerts: checked,
-                        },
-                      })
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="expenseReminders">Expense Reminders</Label>
+                  <Label htmlFor="expenseReminders">{dictionary.settings.expense_reminders}</Label>
                   <Switch
                     id="expenseReminders"
                     checked={settings?.notifications?.expenseReminders || false}
@@ -381,8 +353,11 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
                     onCheckedChange={(checked) =>
                       updateSettings({
                         notifications: {
-                          ...settings.notifications,
+                          ...settings?.notifications,
                           expenseReminders: checked,
+                          enabled: settings?.notifications?.enabled || false,
+                          budgetAlerts: settings?.notifications?.budgetAlerts || false,
+                          weeklyReports: settings?.notifications?.weeklyReports || false,
                         },
                       })
                     }
@@ -390,7 +365,27 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="weeklyReports">Weekly Reports</Label>
+                  <Label htmlFor="budgetAlerts">{dictionary.settings.budget_alerts}</Label>
+                  <Switch
+                    id="budgetAlerts"
+                    checked={settings?.notifications?.budgetAlerts || false}
+                    disabled={!settings?.notifications?.enabled}
+                    onCheckedChange={(checked) =>
+                      updateSettings({
+                        notifications: {
+                          ...settings?.notifications,
+                          budgetAlerts: checked,
+                          enabled: settings?.notifications?.enabled || false,
+                          expenseReminders: settings?.notifications?.expenseReminders || false,
+                          weeklyReports: settings?.notifications?.weeklyReports || false,
+                        },
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="weeklyReports">{dictionary.settings.weekly_reports}</Label>
                   <Switch
                     id="weeklyReports"
                     checked={settings?.notifications?.weeklyReports || false}
@@ -398,117 +393,20 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
                     onCheckedChange={(checked) =>
                       updateSettings({
                         notifications: {
-                          ...settings.notifications,
+                          ...settings?.notifications,
                           weeklyReports: checked,
+                          enabled: settings?.notifications?.enabled || false,
+                          expenseReminders: settings?.notifications?.expenseReminders || false,
+                          budgetAlerts: settings?.notifications?.budgetAlerts || false,
                         },
                       })
                     }
                   />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium">Notification Methods</h3>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="pushNotifications">In-App Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Show notifications in the app</p>
-                  </div>
-                  <Switch
-                    id="pushNotifications"
-                    checked={settings?.notifications?.pushNotifications || false}
-                    disabled={!settings?.notifications?.enabled}
-                    onCheckedChange={(checked) =>
-                      updateSettings({
-                        notifications: {
-                          ...settings.notifications,
-                          pushNotifications: checked,
-                        },
-                      })
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="emailNotifications">Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">Receive notifications via email</p>
-                  </div>
-                  <Switch
-                    id="emailNotifications"
-                    checked={settings?.notifications?.emailNotifications || false}
-                    disabled={!settings?.notifications?.enabled}
-                    onCheckedChange={(checked) =>
-                      updateSettings({
-                        notifications: {
-                          ...settings.notifications,
-                          emailNotifications: checked,
-                        },
-                      })
-                    }
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium">Budget Alert Thresholds</h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="alertThreshold">Warning Threshold (%)</Label>
-                    <Input
-                      id="alertThreshold"
-                      type="number"
-                      min="1"
-                      max="100"
-                      value={settings?.budgetAlerts?.alertThreshold || 80}
-                      onChange={(e) =>
-                        updateSettings({
-                          budgetAlerts: {
-                            ...settings.budgetAlerts,
-                            alertThreshold: Number.parseInt(e.target.value) || 80,
-                          },
-                        })
-                      }
-                      className={isRtl ? "text-right" : ""}
-                    />
-                    <p className="text-xs text-muted-foreground">Show warning when budget reaches this percentage</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="criticalThreshold">Critical Threshold (%)</Label>
-                    <Input
-                      id="criticalThreshold"
-                      type="number"
-                      min="1"
-                      max="100"
-                      value={settings?.budgetAlerts?.criticalThreshold || 95}
-                      onChange={(e) =>
-                        updateSettings({
-                          budgetAlerts: {
-                            ...settings.budgetAlerts,
-                            criticalThreshold: Number.parseInt(e.target.value) || 95,
-                          },
-                        })
-                      }
-                      className={isRtl ? "text-right" : ""}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Show critical alert when budget reaches this percentage
-                    </p>
-                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="preferences" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>
@@ -527,6 +425,8 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
                         currencyDisplay: {
                           ...settings?.currencyDisplay,
                           symbol: e.target.value,
+                          decimalPlaces: settings?.currencyDisplay?.decimalPlaces ?? 2,
+                          thousandSeparator: settings?.currencyDisplay?.thousandSeparator || ",",
                         },
                       })
                     }
@@ -542,6 +442,8 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
                         currencyDisplay: {
                           ...settings?.currencyDisplay,
                           decimalPlaces: Number.parseInt(value),
+                          symbol: settings?.currencyDisplay?.symbol || "$",
+                          thousandSeparator: settings?.currencyDisplay?.thousandSeparator || ",",
                         },
                       })
                     }
@@ -567,6 +469,8 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
                         currencyDisplay: {
                           ...settings?.currencyDisplay,
                           thousandSeparator: value === "none" ? "" : value,
+                          symbol: settings?.currencyDisplay?.symbol || "$",
+                          decimalPlaces: settings?.currencyDisplay?.decimalPlaces ?? 2,
                         },
                       })
                     }
@@ -582,107 +486,6 @@ export function SettingsPage({ dictionary, lang }: { dictionary: any; lang: stri
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Privacy Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="analyticsTracking">Analytics Tracking</Label>
-                  <p className="text-sm text-muted-foreground">Allow anonymous usage data collection</p>
-                </div>
-                <Switch
-                  id="analyticsTracking"
-                  checked={settings?.privacy?.analyticsTracking || false}
-                  onCheckedChange={(checked) =>
-                    updateSettings({
-                      privacy: {
-                        ...settings.privacy,
-                        analyticsTracking: checked,
-                      },
-                    })
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="dataSharing">Data Sharing</Label>
-                  <p className="text-sm text-muted-foreground">Share anonymized data to improve services</p>
-                </div>
-                <Switch
-                  id="dataSharing"
-                  checked={settings?.privacy?.dataSharing || false}
-                  onCheckedChange={(checked) =>
-                    updateSettings({
-                      privacy: {
-                        ...settings.privacy,
-                        dataSharing: checked,
-                      },
-                    })
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Backup Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="autoBackup">Automatic Backup</Label>
-                  <p className="text-sm text-muted-foreground">Automatically backup your data</p>
-                </div>
-                <Switch
-                  id="autoBackup"
-                  checked={settings?.backup?.autoBackup || false}
-                  onCheckedChange={(checked) =>
-                    updateSettings({
-                      backup: {
-                        ...settings.backup,
-                        autoBackup: checked,
-                      },
-                    })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="backupFrequency">Backup Frequency</Label>
-                <Select
-                  value={settings?.backup?.frequency || "weekly"}
-                  onValueChange={(value) =>
-                    updateSettings({
-                      backup: {
-                        ...settings.backup,
-                        frequency: value,
-                      },
-                    })
-                  }
-                  disabled={!settings?.backup?.autoBackup}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {backupFrequencies.map((frequency) => (
-                      <SelectItem key={frequency.value} value={frequency.value}>
-                        {frequency.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </CardContent>
           </Card>

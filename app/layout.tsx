@@ -2,8 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { SettingsProvider } from "@/contexts/settings-context"
-import { DashboardProvider } from "@/contexts/dashboard-context"
 
 export const metadata: Metadata = {
   title: "Modern Expense Tracker",
@@ -18,13 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <ThemeProvider>
-          <SettingsProvider>
-            <DashboardProvider>
-              {children}
-            </DashboardProvider>
-          </SettingsProvider>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )

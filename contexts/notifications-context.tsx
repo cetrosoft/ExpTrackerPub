@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import { useSettings } from "@/contexts/settings-context"
 
 export interface Notification {
   id: string
@@ -28,7 +27,6 @@ const NotificationsContext = createContext<NotificationsContextType | undefined>
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const { settings } = useSettings()
 
   // Load notifications from localStorage on mount
   useEffect(() => {
@@ -46,7 +44,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     }
   }, [])
 
-  // Save notifications to localStorage whenever they change
+  // Save notifications to localStorage when they change
   useEffect(() => {
     try {
       localStorage.setItem("notifications", JSON.stringify(notifications))
@@ -58,23 +56,6 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const unreadCount = notifications.filter((n) => !n.isRead).length
 
   const addNotification = (notificationData: Omit<Notification, "id" | "isRead" | "createdAt">) => {
-    // Check if notifications are enabled in settings
-    if (!settings?.notifications?.enabled) return
-
-    // Check specific notification type settings
-    if (
-      notificationData.type === "warning" &&
-      notificationData.message.includes("budget") &&
-      !settings?.notifications?.budgetAlerts
-    )
-      return
-    if (
-      notificationData.type === "error" &&
-      notificationData.message.includes("budget") &&
-      !settings?.notifications?.budgetAlerts
-    )
-      return
-
     const newNotification: Notification = {
       ...notificationData,
       id: Date.now().toString(),

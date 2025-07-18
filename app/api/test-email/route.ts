@@ -1,40 +1,26 @@
 import { NextResponse } from "next/server"
-import { sendEmailNotification, emailTemplates } from "@/lib/email-service"
+import { Resend } from "resend"
+import { EmailService } from "@/lib/email-service"
 
-export async function GET() {
+const resend = new Resend(process.env.RESEND_API_KEY)
+const emailService = new EmailService(resend)
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const toEmail = searchParams.get("to") || "test@example.com"
+  const subject = searchParams.get("subject") || "Test Email from Expense Tracker"
+  const htmlContent = searchParams.get("html") || "<p>This is a test email from your Expense Tracker application.</p>"
+
   try {
-    console.log("=== Email Test Debug Info ===")
-    console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY)
-    console.log("RESEND_API_KEY preview:", process.env.RESEND_API_KEY?.substring(0, 10) + "...")
-    console.log("FROM_EMAIL:", process.env.FROM_EMAIL)
-    console.log("NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL)
-
-    const template = emailTemplates.budgetWarning("Test Budget", 1000, 800, 80)
-
-    const result = await sendEmailNotification({
-      to: "walid.abdallah.ahmed@gmail.com",
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
+    const data = await emailService.sendEmail({
+      to: toEmail,
+      subject: subject,
+      html: htmlContent,
     })
 
-    return NextResponse.json({
-      success: result,
-      message: result ? "Email sent successfully!" : "Failed to send email",
-      debug: {
-        apiKeyExists: !!process.env.RESEND_API_KEY,
-        fromEmail: process.env.FROM_EMAIL,
-        appUrl: process.env.NEXT_PUBLIC_APP_URL,
-      },
-    })
+    return NextResponse.json({ message: "Test email sent successfully", data })
   } catch (error) {
-    console.error("Email test failed:", error)
-    return NextResponse.json(
-      {
-        error: "Failed to send test email",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    )
+    console.error("Error sending test email:", error)
+    return NextResponse.json({ error: "Failed to send test email" }, { status: 500 })
   }
 }

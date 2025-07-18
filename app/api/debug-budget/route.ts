@@ -1,101 +1,68 @@
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase-client"
+import { getDatabaseAdapter } from "@/server/api/adapters/database-adapter"
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const userId = searchParams.get("userId")
+  const budgetId = searchParams.get("budgetId")
+
+  if (!userId || !budgetId) {
+    return NextResponse.json({ error: "User ID and Budget ID are required" }, { status: 400 })
+  }
+
   try {
-    // Get current month dates
+    const db = await getDatabaseAdapter()
+    const budget = await db.getBudget(budgetId, userId)
+
+    if (!budget) {
+      return NextResponse.json({ error: "Budget not found" }, { status: 404 })
+    }
+
+    const expenses = await db.getExpenses(userId)
+    const categories = await db.getCategories(userId)
+
     const now = new Date()
-    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
-    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    let periodStart: Date
+    let periodEnd: Date
 
-    console.log("Debug period:", periodStart.toISOString().split("T")[0], "to", periodEnd.toISOString().split("T")[0])
-
-    // Get all expenses for current month (without user filter for now)
-    const { data: expenses, error: expensesError } = await supabase
-      .from("expenses")
-      .select("*")
-      .gte("date", periodStart.toISOString().split("T")[0])
-      .lte("date", periodEnd.toISOString().split("T")[0])
-      .order("date", { ascending: false })
-
-    console.log("Expenses query result:", { data: expenses, error: expensesError })
-
-    if (expensesError) {
-      console.error("Expenses error:", expensesError)
-      return NextResponse.json(
-        {
-          error: "Failed to fetch expenses",
-          details: expensesError.message,
-          step: "expenses",
-        },
-        { status: 500 },
-      )
+    if (budget.period === "monthly") {
+      periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
+      periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    } else {
+      periodStart = new Date(now.getFullYear(), 0, 1)
+      periodEnd = new Date(now.getFullYear(), 11, 31)
     }
 
-    // Get all budgets (without user filter for now)
-    const { data: budgets, error: budgetsError } = await supabase.from("budgets").select("*").eq("is_active", true)
+    const periodExpenses = expenses.filter((expense: any) => {
+      const expenseDate = new Date(expense.date)
+      const isInPeriod = expenseDate >= periodStart && expenseDate <= periodEnd
+      const isMatchingCategory = expense.category_id === budget.category_id || expense.category === budget.category_id
 
-    console.log("Budgets query result:", { data: budgets, error: budgetsError })
+      return isInPeriod && isMatchingCategory
+    })
 
-    if (budgetsError) {
-      console.error("Budgets error:", budgetsError)
-      return NextResponse.json(
-        {
-          error: "Failed to fetch budgets",
-          details: budgetsError.message,
-          step: "budgets",
-        },
-        { status: 500 },
-      )
-    }
+    const spentAmount = periodExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0)
+    const remainingAmount = budget.amount - spentAmount
+    const percentageUsed = budget.amount > 0 ? (spentAmount / budget.amount) * 100 : 0
+    const isOverBudget = spentAmount > budget.amount
+    const isNearLimit = percentageUsed >= budget.alert_threshold && !isOverBudget
 
-    // Get all categories (without user filter for now)
-    const { data: categories, error: categoriesError } = await supabase.from("categories").select("*")
+    const category = categories.find((c: any) => c.id === budget.category_id)
 
-    console.log("Categories query result:", { data: categories, error: categoriesError })
-
-    if (categoriesError) {
-      console.error("Categories error:", categoriesError)
-      return NextResponse.json(
-        {
-          error: "Failed to fetch categories",
-          details: categoriesError.message,
-          step: "categories",
-        },
-        { status: 500 },
-      )
-    }
-
-    // Simple data return
-    const debugData = {
-      period: {
-        start: periodStart.toISOString().split("T")[0],
-        end: periodEnd.toISOString().split("T")[0],
-      },
-      raw_data: {
-        expenses: expenses || [],
-        budgets: budgets || [],
-        categories: categories || [],
-      },
-      summary: {
-        total_expenses: expenses?.length || 0,
-        total_budgets: budgets?.length || 0,
-        total_categories: categories?.length || 0,
-      },
-    }
-
-    console.log("Returning debug data:", debugData)
-
-    return NextResponse.json(debugData, { status: 200 })
-  } catch (error: any) {
-    console.error("Debug route error:", error)
-    return NextResponse.json(
-      {
-        error: "Internal server error",
-        details: error.message,
-        stack: error.stack,
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({
+      budget,
+      category,
+      periodStart: periodStart.toISOString(),
+      periodEnd: periodEnd.toISOString(),
+      spentAmount,
+      remainingAmount,
+      percentageUsed,
+      isOverBudget,
+      isNearLimit,
+      periodExpenses,
+    })
+  } catch (error) {
+    console.error("Error debugging budget:", error)
+    return NextResponse.json({ error: "Failed to debug budget" }, { status: 500 })
   }
 }
