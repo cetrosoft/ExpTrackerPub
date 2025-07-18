@@ -3,11 +3,7 @@
 import { useState } from "react"
 import { useCurrencies } from "@/contexts/currencies-context"
 import { cn } from "@/lib/utils"
-<<<<<<< HEAD
 import { Plus, Edit, Trash, MoreHorizontal, DollarSign, Star, Eye, EyeOff, Lock } from "lucide-react"
-=======
-import { Plus, Edit, Trash, MoreHorizontal, DollarSign, Star, Eye, EyeOff } from "lucide-react"
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -24,17 +20,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-<<<<<<< HEAD
 import { useAuth } from "@/contexts/auth-context"
 
 export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: string }) {
   const { currencies, deleteCurrency, updateCurrency, setDefaultCurrency } = useCurrencies()
   const { user } = useAuth()
-=======
-
-export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: string }) {
-  const { currencies, deleteCurrency, updateCurrency, setDefaultCurrency } = useCurrencies()
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [editingCurrency, setEditingCurrency] = useState<string | null>(null)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(null)
@@ -57,7 +47,6 @@ export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: st
 
   const currencyToEdit = editingCurrency ? currencies.find((c) => c.id === editingCurrency) : undefined
 
-<<<<<<< HEAD
   // Helper function to check if currency is editable
   const isCurrencyEditable = (currency: any) => {
     // Currency is editable if user is signed in and it has a createdAt (meaning it's user-created)
@@ -68,9 +57,6 @@ export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: st
     const isEditable = isCurrencyEditable(currency)
     const isDefaultCurrency = !currency.createdAt // Default currencies don't have createdAt
 
-=======
-  const CurrencyCard = ({ currency }: { currency: any }) => {
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     return (
       <Card className="p-4">
         <div className={cn("flex items-center justify-between", isRtl && "flex-row-reverse")}>
@@ -91,15 +77,12 @@ export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: st
                 <Badge variant={currency.isActive ? "default" : "secondary"}>
                   {currency.isActive ? "Active" : "Inactive"}
                 </Badge>
-<<<<<<< HEAD
                 {isDefaultCurrency && (
                   <Badge variant="outline" className="bg-blue-50 text-blue-700">
                     <Lock className="w-3 h-3 mr-1" />
                     System
                   </Badge>
                 )}
-=======
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
               </div>
               <p className="text-sm font-medium">{currency.name}</p>
               <p className="text-sm text-muted-foreground">
@@ -116,7 +99,6 @@ export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: st
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align={isRtl ? "start" : "end"}>
-<<<<<<< HEAD
               {isEditable && (
                 <DropdownMenuItem onClick={() => setEditingCurrency(currency.id)}>
                   <Edit className="mr-2 h-4 w-4" />
@@ -124,19 +106,11 @@ export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: st
                 </DropdownMenuItem>
               )}
               {isEditable && !currency.isDefault && (
-=======
-              <DropdownMenuItem onClick={() => setEditingCurrency(currency.id)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit Currency
-              </DropdownMenuItem>
-              {!currency.isDefault && (
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
                 <DropdownMenuItem onClick={() => handleSetDefault(currency.id)}>
                   <Star className="mr-2 h-4 w-4" />
                   Set as Default
                 </DropdownMenuItem>
               )}
-<<<<<<< HEAD
               {isEditable && (
                 <DropdownMenuItem onClick={() => toggleCurrencyStatus(currency.id, currency.isActive)}>
                   {currency.isActive ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
@@ -155,20 +129,6 @@ export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: st
                   System Currency (Read-only)
                 </DropdownMenuItem>
               )}
-=======
-              <DropdownMenuItem onClick={() => toggleCurrencyStatus(currency.id, currency.isActive)}>
-                {currency.isActive ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-                {currency.isActive ? "Deactivate" : "Activate"}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setDeleteConfirmOpen(currency.id)}
-                className="text-red-600"
-                disabled={currency.isDefault}
-              >
-                <Trash className="mr-2 h-4 w-4" />
-                Delete Currency
-              </DropdownMenuItem>
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -180,17 +140,12 @@ export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: st
     <div className="space-y-6">
       <div className={cn("flex items-center justify-between", isRtl && "flex-row-reverse")}>
         <h1 className="text-2xl font-bold">Currencies Management</h1>
-<<<<<<< HEAD
         <Button onClick={() => setIsAddDialogOpen(true)} disabled={!user}>
-=======
-        <Button onClick={() => setIsAddDialogOpen(true)}>
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
           <Plus className="mr-2 h-4 w-4" />
           Add Currency
         </Button>
       </div>
 
-<<<<<<< HEAD
       {!user && (
         <Card className="p-4 bg-blue-50 border-blue-200">
           <p className="text-blue-800 text-sm">
@@ -200,8 +155,6 @@ export function CurrenciesList({ dictionary, lang }: { dictionary: any; lang: st
         </Card>
       )}
 
-=======
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
       {currencies.length === 0 ? (
         <Card className="p-8 text-center">
           <p className="text-muted-foreground">No currencies found</p>

@@ -1,15 +1,10 @@
 "use client"
 
 import type React from "react"
-<<<<<<< HEAD
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useSupabase } from "@/lib/supabase-client"
 import { useAuth } from "@/contexts/auth-context"
-=======
-import { createContext, useContext, useState, useCallback } from "react"
-import { useToast } from "@/hooks/use-toast"
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
 export interface Currency {
   id: string
@@ -19,36 +14,21 @@ export interface Currency {
   exchangeRate: number
   isDefault: boolean
   isActive: boolean
-<<<<<<< HEAD
   createdAt?: string
   updatedAt?: string
-=======
-  createdAt: string
-  updatedAt: string
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 }
 
 interface CurrenciesContextType {
   currencies: Currency[]
-<<<<<<< HEAD
   isLoading: boolean
   addCurrency: (currency: Omit<Currency, "id" | "createdAt" | "updatedAt">) => Promise<void>
   updateCurrency: (id: string, currency: Partial<Currency>) => Promise<void>
   deleteCurrency: (id: string) => Promise<void>
-=======
-  addCurrency: (currency: Omit<Currency, "id" | "createdAt" | "updatedAt">) => void
-  updateCurrency: (id: string, currency: Partial<Currency>) => void
-  deleteCurrency: (id: string) => void
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   getCurrencyById: (id: string) => Currency | undefined
   getCurrencyByCode: (code: string) => Currency | undefined
   getActiveCurrencies: () => Currency[]
   getDefaultCurrency: () => Currency | undefined
-<<<<<<< HEAD
   setDefaultCurrency: (id: string) => Promise<void>
-=======
-  setDefaultCurrency: (id: string) => void
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 }
 
 const CurrenciesContext = createContext<CurrenciesContextType | undefined>(undefined)
@@ -61,7 +41,6 @@ export function useCurrencies() {
   return context
 }
 
-<<<<<<< HEAD
 // Helper function to convert database format to frontend format
 function dbToFrontend(dbCurrency: any): Currency {
   return {
@@ -154,116 +133,15 @@ export function CurrenciesProvider({ children }: { children: React.ReactNode }) 
         toast({
           title: "Error",
           description: "You must be signed in to add custom currencies",
-=======
-// Sample currencies for demonstration
-const sampleCurrencies: Currency[] = [
-  {
-    id: "usd",
-    code: "USD",
-    name: "US Dollar",
-    symbol: "$",
-    exchangeRate: 1.0,
-    isDefault: false,
-    isActive: true,
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-  },
-  {
-    id: "egp",
-    code: "EGP",
-    name: "Egyptian Pound",
-    symbol: "LE",
-    exchangeRate: 30.5,
-    isDefault: true,
-    isActive: true,
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-  },
-  {
-    id: "eur",
-    code: "EUR",
-    name: "Euro",
-    symbol: "€",
-    exchangeRate: 0.85,
-    isDefault: false,
-    isActive: true,
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-  },
-  {
-    id: "gbp",
-    code: "GBP",
-    name: "British Pound",
-    symbol: "£",
-    exchangeRate: 0.73,
-    isDefault: false,
-    isActive: true,
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-  },
-  {
-    id: "inr",
-    code: "INR",
-    name: "Indian Rupee",
-    symbol: "₹",
-    exchangeRate: 83.2,
-    isDefault: false,
-    isActive: true,
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-  },
-]
-
-export function CurrenciesProvider({ children }: { children: React.ReactNode }) {
-  const [currencies, setCurrencies] = useState<Currency[]>(sampleCurrencies)
-  const { toast } = useToast()
-
-  const addCurrency = useCallback(
-    (currencyData: Omit<Currency, "id" | "createdAt" | "updatedAt">) => {
-      // Check if currency code already exists
-      const existingCurrency = currencies.find(
-        (currency) => currency.code.toLowerCase() === currencyData.code.toLowerCase(),
-      )
-
-      if (existingCurrency) {
-        toast({
-          title: "Error",
-          description: "A currency with this code already exists",
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
           variant: "destructive",
         })
         return
       }
 
-<<<<<<< HEAD
       try {
         // Check if currency code already exists
         const existingCurrency = currencies.find(
           (currency) => currency.code.toLowerCase() === currencyData.code.toLowerCase(),
-=======
-      const newCurrency: Currency = {
-        ...currencyData,
-        id: `currency_${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-
-      setCurrencies((prev) => [...prev, newCurrency])
-      toast({
-        title: "Success",
-        description: "Currency added successfully",
-      })
-    },
-    [currencies, toast],
-  )
-
-  const updateCurrency = useCallback(
-    (id: string, currencyData: Partial<Currency>) => {
-      // Check if new code conflicts with existing currencies
-      if (currencyData.code) {
-        const existingCurrency = currencies.find(
-          (currency) => currency.id !== id && currency.code.toLowerCase() === currencyData.code.toLowerCase(),
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
         )
 
         if (existingCurrency) {
@@ -274,7 +152,6 @@ export function CurrenciesProvider({ children }: { children: React.ReactNode }) 
           })
           return
         }
-<<<<<<< HEAD
 
         const dbCurrency = {
           ...frontendToDb(currencyData),
@@ -421,37 +298,11 @@ export function CurrenciesProvider({ children }: { children: React.ReactNode }) 
         toast({
           title: "Error",
           description: "You must be signed in to delete currencies",
-=======
-      }
-
-      setCurrencies((prev) =>
-        prev.map((currency) =>
-          currency.id === id ? { ...currency, ...currencyData, updatedAt: new Date().toISOString() } : currency,
-        ),
-      )
-
-      toast({
-        title: "Success",
-        description: "Currency updated successfully",
-      })
-    },
-    [currencies, toast],
-  )
-
-  const deleteCurrency = useCallback(
-    (id: string) => {
-      const currency = currencies.find((c) => c.id === id)
-      if (currency?.isDefault) {
-        toast({
-          title: "Error",
-          description: "Cannot delete the default currency",
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
           variant: "destructive",
         })
         return
       }
 
-<<<<<<< HEAD
       try {
         const currency = currencies.find((c) => c.id === id)
 
@@ -502,15 +353,6 @@ export function CurrenciesProvider({ children }: { children: React.ReactNode }) 
       }
     },
     [currencies, toast, supabase, user],
-=======
-      setCurrencies((prev) => prev.filter((currency) => currency.id !== id))
-      toast({
-        title: "Success",
-        description: "Currency deleted successfully",
-      })
-    },
-    [currencies, toast],
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   )
 
   const getCurrencyById = useCallback(
@@ -536,7 +378,6 @@ export function CurrenciesProvider({ children }: { children: React.ReactNode }) 
   }, [currencies])
 
   const setDefaultCurrency = useCallback(
-<<<<<<< HEAD
     async (id: string) => {
       if (!user) {
         toast({
@@ -603,31 +444,11 @@ export function CurrenciesProvider({ children }: { children: React.ReactNode }) 
       }
     },
     [toast, supabase, user],
-=======
-    (id: string) => {
-      setCurrencies((prev) =>
-        prev.map((currency) => ({
-          ...currency,
-          isDefault: currency.id === id,
-          updatedAt: new Date().toISOString(),
-        })),
-      )
-
-      toast({
-        title: "Success",
-        description: "Default currency updated successfully",
-      })
-    },
-    [toast],
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   )
 
   const value: CurrenciesContextType = {
     currencies,
-<<<<<<< HEAD
     isLoading,
-=======
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     addCurrency,
     updateCurrency,
     deleteCurrency,

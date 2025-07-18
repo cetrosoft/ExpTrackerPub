@@ -1,10 +1,7 @@
 "use client"
 
 import { createClient } from "@supabase/supabase-js"
-<<<<<<< HEAD
 import { useState } from "react"
-=======
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -13,7 +10,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Missing Supabase environment variables")
 }
 
-<<<<<<< HEAD
 // Singleton pattern to prevent multiple instances
 let supabaseInstance: ReturnType<typeof createClient> | null = null
 
@@ -32,9 +28,6 @@ export function useSupabase() {
 }
 
 export const supabase = getSupabaseClient()
-=======
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
 // Types for our database
 export interface Expense {
@@ -104,9 +97,3 @@ export interface BudgetPeriod {
   created_at: string
   updated_at: string
 }
-<<<<<<< HEAD
-=======
-
-// Named export for compatibility
-export { supabase as createClient }
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d

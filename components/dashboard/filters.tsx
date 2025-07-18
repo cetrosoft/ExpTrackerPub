@@ -1,6 +1,5 @@
 "use client"
 
-<<<<<<< HEAD
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useDashboard } from "@/contexts/dashboard-context"
 import { Button } from "@/components/ui/button"
@@ -206,60 +205,10 @@ export function DashboardFilters({ dictionary }: { dictionary: any }) {
                   {months.map((month) => (
                     <SelectItem key={month.value} value={month.value.toString()}>
                       {month.label}
-=======
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
-import { Calendar, Filter } from "lucide-react"
-import { useDashboard } from "@/contexts/dashboard-context"
-import { useCurrencies } from "@/contexts/currencies-context"
-
-export function DashboardFilters({ dictionary }: { dictionary: any }) {
-  const { filters, updateFilters } = useDashboard()
-  const { currencies } = useCurrencies()
-
-  const handleCurrentMonth = () => {
-    const now = new Date()
-    updateFilters({
-      month: now.getMonth() + 1,
-      year: now.getFullYear(),
-    })
-  }
-
-  return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Filter className="w-5 h-5 text-gray-500" />
-            <h3 className="text-lg font-semibold text-gray-900">Dashboard Filters</h3>
-          </div>
-
-          <div className="flex flex-wrap gap-3 items-center">
-            <Button variant="outline" onClick={handleCurrentMonth} className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4" />
-              <span>Current Month</span>
-            </Button>
-
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">Currency:</label>
-              <Select value={filters.currency} onValueChange={(value) => updateFilters({ currency: value })}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  {currencies.map((currency) => (
-                    <SelectItem key={currency.code} value={currency.code}>
-                      <div className="flex items-center space-x-2">
-                        <span>{currency.symbol}</span>
-                        <span>{currency.name}</span>
-                      </div>
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-<<<<<<< HEAD
 
               <Button variant="outline" size="icon" onClick={goToNextMonth} className="h-10 w-10 bg-white">
                 <ChevronRight className="h-4 w-4" />
@@ -298,12 +247,5 @@ export function DashboardFilters({ dictionary }: { dictionary: any }) {
         </div>
       </div>
     </div>
-=======
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   )
 }

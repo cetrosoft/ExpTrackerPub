@@ -1,11 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
-<<<<<<< HEAD
 //import { createDatabaseAdapter } from "@/lib/database/database-adapter"
 import { createDatabaseAdapter } from '@/server/api/adapters/database-adapter';
 
-=======
-import { createDatabaseAdapter } from "@/lib/database/database-adapter"
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 import { config } from "@/lib/config"
 
 // This endpoint handles syncing local changes to the server

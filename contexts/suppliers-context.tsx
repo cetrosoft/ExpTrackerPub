@@ -1,15 +1,10 @@
 "use client"
 
 import type React from "react"
-<<<<<<< HEAD
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useSupabase } from "@/lib/supabase-client"
 import { useAuth } from "@/contexts/auth-context"
-=======
-import { createContext, useContext, useState, useCallback } from "react"
-import { useToast } from "@/hooks/use-toast"
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
 export interface Supplier {
   id: string
@@ -17,33 +12,19 @@ export interface Supplier {
   email?: string
   phone?: string
   address?: string
-<<<<<<< HEAD
   contact_person?: string // Changed to snake_case to match database
   notes?: string
   is_active: boolean
   created_at?: string
   updated_at?: string
-=======
-  contactPerson?: string
-  notes?: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 }
 
 interface SuppliersContextType {
   suppliers: Supplier[]
-<<<<<<< HEAD
   isLoading: boolean
   addSupplier: (supplier: Omit<Supplier, "id" | "created_at" | "updated_at">) => Promise<void>
   updateSupplier: (id: string, supplier: Partial<Supplier>) => Promise<void>
   deleteSupplier: (id: string) => Promise<void>
-=======
-  addSupplier: (supplier: Omit<Supplier, "id" | "createdAt" | "updatedAt">) => void
-  updateSupplier: (id: string, supplier: Partial<Supplier>) => void
-  deleteSupplier: (id: string) => void
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   getSupplierById: (id: string) => Supplier | undefined
   getActiveSuppliers: () => Supplier[]
 }
@@ -58,7 +39,6 @@ export function useSuppliers() {
   return context
 }
 
-<<<<<<< HEAD
 export function SuppliersProvider({ children }: { children: React.ReactNode }) {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -118,97 +98,15 @@ export function SuppliersProvider({ children }: { children: React.ReactNode }) {
         toast({
           title: "Error",
           description: "You must be signed in to add suppliers",
-=======
-// Sample suppliers for demonstration
-const sampleSuppliers: Supplier[] = [
-  {
-    id: "supplier_1",
-    name: "Tech Solutions Ltd",
-    email: "contact@techsolutions.com",
-    phone: "+1-555-0123",
-    address: "123 Business St, Tech City, TC 12345",
-    contactPerson: "John Smith",
-    notes: "Reliable technology supplier",
-    isActive: true,
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-  },
-  {
-    id: "supplier_2",
-    name: "Office Supplies Co",
-    email: "orders@officesupplies.com",
-    phone: "+1-555-0456",
-    address: "456 Supply Ave, Business Park, BP 67890",
-    contactPerson: "Sarah Johnson",
-    notes: "Office equipment and supplies",
-    isActive: true,
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-  },
-  {
-    id: "supplier_3",
-    name: "Catering Services",
-    email: "info@catering.com",
-    phone: "+1-555-0789",
-    address: "789 Food St, Culinary District, CD 13579",
-    contactPerson: "Mike Wilson",
-    notes: "Corporate catering and events",
-    isActive: false,
-    createdAt: "2025-01-01T00:00:00Z",
-    updatedAt: "2025-01-01T00:00:00Z",
-  },
-]
-
-export function SuppliersProvider({ children }: { children: React.ReactNode }) {
-  const [suppliers, setSuppliers] = useState<Supplier[]>(sampleSuppliers)
-  const { toast } = useToast()
-
-  const addSupplier = useCallback(
-    (supplierData: Omit<Supplier, "id" | "createdAt" | "updatedAt">) => {
-      // Check if supplier name already exists
-      const existingSupplier = suppliers.find(
-        (supplier) => supplier.name.toLowerCase() === supplierData.name.toLowerCase(),
-      )
-
-      if (existingSupplier) {
-        toast({
-          title: "Error",
-          description: "A supplier with this name already exists",
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
           variant: "destructive",
         })
         return
       }
 
-<<<<<<< HEAD
       try {
         // Check if supplier name already exists
         const existingSupplier = suppliers.find(
           (supplier) => supplier.name.toLowerCase() === supplierData.name.toLowerCase(),
-=======
-      const newSupplier: Supplier = {
-        ...supplierData,
-        id: `supplier_${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-
-      setSuppliers((prev) => [...prev, newSupplier])
-      toast({
-        title: "Success",
-        description: "Supplier added successfully",
-      })
-    },
-    [suppliers, toast],
-  )
-
-  const updateSupplier = useCallback(
-    (id: string, supplierData: Partial<Supplier>) => {
-      // Check if new name conflicts with existing suppliers
-      if (supplierData.name) {
-        const existingSupplier = suppliers.find(
-          (supplier) => supplier.id !== id && supplier.name.toLowerCase() === supplierData.name.toLowerCase(),
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
         )
 
         if (existingSupplier) {
@@ -219,7 +117,6 @@ export function SuppliersProvider({ children }: { children: React.ReactNode }) {
           })
           return
         }
-<<<<<<< HEAD
 
         const newSupplier = {
           name: supplierData.name,
@@ -367,33 +264,6 @@ export function SuppliersProvider({ children }: { children: React.ReactNode }) {
       }
     },
     [toast, supabase, user],
-=======
-      }
-
-      setSuppliers((prev) =>
-        prev.map((supplier) =>
-          supplier.id === id ? { ...supplier, ...supplierData, updatedAt: new Date().toISOString() } : supplier,
-        ),
-      )
-
-      toast({
-        title: "Success",
-        description: "Supplier updated successfully",
-      })
-    },
-    [suppliers, toast],
-  )
-
-  const deleteSupplier = useCallback(
-    (id: string) => {
-      setSuppliers((prev) => prev.filter((supplier) => supplier.id !== id))
-      toast({
-        title: "Success",
-        description: "Supplier deleted successfully",
-      })
-    },
-    [toast],
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   )
 
   const getSupplierById = useCallback(
@@ -404,19 +274,12 @@ export function SuppliersProvider({ children }: { children: React.ReactNode }) {
   )
 
   const getActiveSuppliers = useCallback(() => {
-<<<<<<< HEAD
     return suppliers.filter((supplier) => supplier.is_active)
-=======
-    return suppliers.filter((supplier) => supplier.isActive)
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   }, [suppliers])
 
   const value: SuppliersContextType = {
     suppliers,
-<<<<<<< HEAD
     isLoading,
-=======
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     addSupplier,
     updateSupplier,
     deleteSupplier,

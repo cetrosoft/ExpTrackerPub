@@ -610,11 +610,7 @@ export function ExpenseList() {
         </div>
       </div>
 
-<<<<<<< HEAD
    {/*    Debug Info - Remove this after fixing
-=======
-      {/* Debug Info - Remove this after fixing */}
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
       {tagFilter !== "all" && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
           <h3 className="font-medium text-yellow-800">Debug Info:</h3>
@@ -628,11 +624,7 @@ export function ExpenseList() {
             </div>
           ))}
         </div>
-<<<<<<< HEAD
       )} */}
-=======
-      )}
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
       {/* No expenses message */}
       {sortedAndFilteredExpenses.length === 0 && (

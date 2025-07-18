@@ -21,13 +21,8 @@ export default async function DashboardPage({
       <div className="space-y-6 p-6">
         {/* Page Header */}
         <div className="flex flex-col space-y-2">
-<<<<<<< HEAD
           {/* <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1> */}
           {/* <p className="text-gray-600">Overview of your expenses and financial data</p> */}
-=======
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Overview of your expenses and financial data</p>
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
         </div>
 
         {/* Filters */}

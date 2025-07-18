@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase-client"
 
@@ -98,24 +97,5 @@ export async function GET() {
       },
       { status: 500 },
     )
-=======
-export const dynamic = "force-dynamic"
-
-import { type NextRequest, NextResponse } from "next/server"
-
-export async function GET(request: NextRequest) {
-  try {
-    const debugInfo = {
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? "Set" : "Not set",
-      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "Set" : "Not set",
-    }
-
-    return NextResponse.json(debugInfo)
-  } catch (error) {
-    console.error("Debug error:", error)
-    return NextResponse.json({ error: "Debug failed" }, { status: 500 })
->>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   }
 }
