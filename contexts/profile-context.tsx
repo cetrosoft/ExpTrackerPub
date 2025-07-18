@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+<<<<<<< HEAD
 import { createContext, useContext, useEffect, useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { supabase } from "@/lib/supabase-client"
@@ -17,22 +18,41 @@ interface UserProfile {
   website?: string
   preferred_language: string
   preferred_currency: string
+=======
+import { createContext, useContext, useState, useEffect } from "react"
+import { useAuth } from "./auth-context"
+
+interface Profile {
+  id: string
+  email: string
+  full_name?: string
+  avatar_url?: string
+  currency_preference: string
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   timezone: string
   created_at: string
   updated_at: string
 }
 
 interface ProfileContextType {
+<<<<<<< HEAD
   profile: UserProfile | null
   loading: boolean
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>
   uploadAvatar: (file: File) => Promise<string>
   refreshProfile: () => Promise<void>
+=======
+  profile: Profile | null
+  loading: boolean
+  updateProfile: (updates: Partial<Profile>) => Promise<void>
+  uploadAvatar: (file: File) => Promise<string>
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined)
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
+<<<<<<< HEAD
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
@@ -163,6 +183,57 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         refreshProfile,
       }}
     >
+=======
+  const { user } = useAuth()
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (user) {
+      // Initialize profile with user data
+      setProfile({
+        id: user.id,
+        email: user.email!,
+        full_name: user.user_metadata?.full_name,
+        avatar_url: user.user_metadata?.avatar_url,
+        currency_preference: "USD",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        created_at: user.created_at,
+        updated_at: new Date().toISOString(),
+      })
+    } else {
+      setProfile(null)
+    }
+    setLoading(false)
+  }, [user])
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!profile) return
+
+    const updatedProfile = {
+      ...profile,
+      ...updates,
+      updated_at: new Date().toISOString(),
+    }
+
+    setProfile(updatedProfile)
+  }
+
+  const uploadAvatar = async (file: File): Promise<string> => {
+    // Mock implementation - in real app, upload to Supabase Storage
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const dataUrl = reader.result as string
+        resolve(dataUrl)
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  return (
+    <ProfileContext.Provider value={{ profile, loading, updateProfile, uploadAvatar }}>
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
       {children}
     </ProfileContext.Provider>
   )

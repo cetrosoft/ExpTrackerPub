@@ -17,25 +17,38 @@ interface Option {
 interface MultiSelectProps {
   options: Option[]
   selected: string[]
+<<<<<<< HEAD
   onValueChange: (selected: string[]) => void
+=======
+  onChange: (selected: string[]) => void
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   placeholder?: string
   searchPlaceholder?: string
   emptyText?: string
   className?: string
+<<<<<<< HEAD
   variant?: "default" | "inverted"
   animation?: number
   maxCount?: number
   defaultValue?: string[]
+=======
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 }
 
 export function MultiSelect({
   options,
+<<<<<<< HEAD
   selected = [],
   onValueChange,
+=======
+  selected,
+  onChange,
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   placeholder = "Select items...",
   searchPlaceholder = "Search...",
   emptyText = "No items found.",
   className,
+<<<<<<< HEAD
   variant = "default",
   animation = 0,
   maxCount = 999,
@@ -72,6 +85,24 @@ export function MultiSelect({
   }
 
   const selectedOptions = options.filter((option) => selectedValues.includes(option.value))
+=======
+}: MultiSelectProps) {
+  const [open, setOpen] = React.useState(false)
+
+  const handleSelect = (value: string) => {
+    if (selected.includes(value)) {
+      onChange(selected.filter((item) => item !== value))
+    } else {
+      onChange([...selected, value])
+    }
+  }
+
+  const handleRemove = (value: string) => {
+    onChange(selected.filter((item) => item !== value))
+  }
+
+  const selectedOptions = options.filter((option) => selected.includes(option.value))
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
   return (
     <div className={cn("w-full", className)}>
@@ -87,6 +118,7 @@ export function MultiSelect({
               {selectedOptions.length === 0 ? (
                 <span className="text-muted-foreground">{placeholder}</span>
               ) : (
+<<<<<<< HEAD
                 selectedOptions.slice(0, maxCount).map((option) => (
                   <Badge
                     key={option.value}
@@ -101,6 +133,14 @@ export function MultiSelect({
                           }
                         : {}
                     }
+=======
+                selectedOptions.map((option) => (
+                  <Badge
+                    key={option.value}
+                    variant="secondary"
+                    className="mr-1 mb-1"
+                    style={option.color ? { backgroundColor: `${option.color}20`, color: option.color } : {}}
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
                   >
                     {option.label}
                     <button
@@ -121,11 +161,14 @@ export function MultiSelect({
                   </Badge>
                 ))
               )}
+<<<<<<< HEAD
               {selectedOptions.length > maxCount && (
                 <Badge variant="secondary" className="mr-1 mb-1">
                   +{selectedOptions.length - maxCount} more
                 </Badge>
               )}
+=======
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
             </div>
             <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -137,6 +180,7 @@ export function MultiSelect({
               <CommandEmpty>{emptyText}</CommandEmpty>
               <CommandGroup className="max-h-64 overflow-auto">
                 {options.map((option) => (
+<<<<<<< HEAD
                   <CommandItem
                     key={option.value}
                     value={option.value}
@@ -151,6 +195,11 @@ export function MultiSelect({
                         "mr-2 h-4 w-4",
                         selectedValues.includes(option.value) ? "opacity-100" : "opacity-0",
                       )}
+=======
+                  <CommandItem key={option.value} value={option.value} onSelect={() => handleSelect(option.value)}>
+                    <Check
+                      className={cn("mr-2 h-4 w-4", selected.includes(option.value) ? "opacity-100" : "opacity-0")}
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
                     />
                     <div className="flex items-center gap-2">
                       {option.color && (

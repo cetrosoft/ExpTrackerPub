@@ -59,21 +59,43 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
 
   const addNotification = (notificationData: Omit<Notification, "id" | "isRead" | "createdAt">) => {
     // Check if notifications are enabled in settings
+<<<<<<< HEAD
     if (!settings?.notifications?.enabled) return
+=======
+    if (!settings?.notifications?.enabled) {
+      console.log("Notifications are disabled in settings")
+      return
+    }
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
     // Check specific notification type settings
     if (
       notificationData.type === "warning" &&
       notificationData.message.includes("budget") &&
       !settings?.notifications?.budgetAlerts
+<<<<<<< HEAD
     )
       return
+=======
+    ) {
+      console.log("Budget alerts are disabled in settings")
+      return
+    }
+
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     if (
       notificationData.type === "error" &&
       notificationData.message.includes("budget") &&
       !settings?.notifications?.budgetAlerts
+<<<<<<< HEAD
     )
       return
+=======
+    ) {
+      console.log("Budget alerts are disabled in settings")
+      return
+    }
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
     const newNotification: Notification = {
       ...notificationData,

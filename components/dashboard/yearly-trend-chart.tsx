@@ -1,5 +1,6 @@
 "use client"
 
+<<<<<<< HEAD
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts"
 import { useExpenses } from "@/contexts/expenses-context"
 import { useCurrencies } from "@/contexts/currencies-context"
@@ -177,5 +178,53 @@ export function YearlyTrendChart({ dictionary, lang }: { dictionary: any; lang: 
         </Card>
       </div>
     </div>
+=======
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+interface YearlyTrendChartProps {
+  data?: Array<{
+    month: string
+    amount: number
+  }>
+}
+
+export function YearlyTrendChart({ data = [] }: YearlyTrendChartProps) {
+  // Default data if none provided
+  const defaultData = [
+    { month: "Jan", amount: 1200 },
+    { month: "Feb", amount: 1500 },
+    { month: "Mar", amount: 1800 },
+    { month: "Apr", amount: 1400 },
+    { month: "May", amount: 1600 },
+    { month: "Jun", amount: 2000 },
+    { month: "Jul", amount: 1900 },
+    { month: "Aug", amount: 2200 },
+    { month: "Sep", amount: 1700 },
+    { month: "Oct", amount: 1800 },
+    { month: "Nov", amount: 2100 },
+    { month: "Dec", amount: 2400 },
+  ]
+
+  const chartData = data.length > 0 ? data : defaultData
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Yearly Spending Trend</CardTitle>
+        <CardDescription>Monthly expense totals for the current year</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={chartData}>
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip formatter={(value) => [`$${value}`, "Amount"]} labelFormatter={(label) => `Month: ${label}`} />
+            <Line type="monotone" dataKey="amount" stroke="#8884d8" strokeWidth={2} dot={{ fill: "#8884d8" }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   )
 }

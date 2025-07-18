@@ -1,26 +1,42 @@
 "use client"
 
 import type React from "react"
+<<<<<<< HEAD
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useSupabase } from "@/lib/supabase-client"
 import { useAuth } from "@/contexts/auth-context"
+=======
+import { createContext, useContext, useState, useCallback } from "react"
+import { useToast } from "@/hooks/use-toast"
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
 export interface Tag {
   id: string
   name: string
   color: string
   description?: string
+<<<<<<< HEAD
   created_at?: string
   updated_at?: string
+=======
+  createdAt: string
+  updatedAt: string
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 }
 
 interface TagsContextType {
   tags: Tag[]
+<<<<<<< HEAD
   isLoading: boolean
   addTag: (tag: Omit<Tag, "id" | "created_at" | "updated_at">) => Promise<void>
   updateTag: (id: string, tag: Partial<Tag>) => Promise<void>
   deleteTag: (id: string) => Promise<void>
+=======
+  addTag: (tag: Omit<Tag, "id" | "createdAt" | "updatedAt">) => void
+  updateTag: (id: string, tag: Partial<Tag>) => void
+  deleteTag: (id: string) => void
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   getTagById: (id: string) => Tag | undefined
   getTagByName: (name: string) => Tag | undefined
 }
@@ -35,6 +51,7 @@ export function useTags() {
   return context
 }
 
+<<<<<<< HEAD
 export function TagsProvider({ children }: { children: React.ReactNode }) {
   const [tags, setTags] = useState<Tag[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -94,14 +111,89 @@ export function TagsProvider({ children }: { children: React.ReactNode }) {
         toast({
           title: "Error",
           description: "You must be signed in to add tags",
+=======
+// Sample tags for demonstration
+const sampleTags: Tag[] = [
+  {
+    id: "urgent",
+    name: "Urgent",
+    color: "#EF4444",
+    description: "Urgent expenses that need immediate attention",
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+  },
+  {
+    id: "recurring",
+    name: "Recurring",
+    color: "#3B82F6",
+    description: "Monthly recurring expenses",
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+  },
+  {
+    id: "business",
+    name: "Business",
+    color: "#10B981",
+    description: "Business-related expenses",
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+  },
+  {
+    id: "personal",
+    name: "Personal",
+    color: "#8B5CF6",
+    description: "Personal expenses",
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+  },
+]
+
+export function TagsProvider({ children }: { children: React.ReactNode }) {
+  const [tags, setTags] = useState<Tag[]>(sampleTags)
+  const { toast } = useToast()
+
+  const addTag = useCallback(
+    (tagData: Omit<Tag, "id" | "createdAt" | "updatedAt">) => {
+      // Check if tag name already exists
+      const existingTag = tags.find((tag) => tag.name.toLowerCase() === tagData.name.toLowerCase())
+
+      if (existingTag) {
+        toast({
+          title: "Error",
+          description: "A tag with this name already exists",
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
           variant: "destructive",
         })
         return
       }
 
+<<<<<<< HEAD
       try {
         // Check if tag name already exists
         const existingTag = tags.find((tag) => tag.name.toLowerCase() === tagData.name.toLowerCase())
+=======
+      const newTag: Tag = {
+        ...tagData,
+        id: `tag_${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      setTags((prev) => [...prev, newTag])
+      toast({
+        title: "Success",
+        description: "Tag added successfully",
+      })
+    },
+    [tags, toast],
+  )
+
+  const updateTag = useCallback(
+    (id: string, tagData: Partial<Tag>) => {
+      // Check if new name conflicts with existing tags
+      if (tagData.name) {
+        const existingTag = tags.find((tag) => tag.id !== id && tag.name.toLowerCase() === tagData.name.toLowerCase())
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
         if (existingTag) {
           toast({
@@ -111,6 +203,7 @@ export function TagsProvider({ children }: { children: React.ReactNode }) {
           })
           return
         }
+<<<<<<< HEAD
 
         const newTag = {
           ...tagData,
@@ -250,6 +343,31 @@ export function TagsProvider({ children }: { children: React.ReactNode }) {
       }
     },
     [toast, supabase, user],
+=======
+      }
+
+      setTags((prev) =>
+        prev.map((tag) => (tag.id === id ? { ...tag, ...tagData, updatedAt: new Date().toISOString() } : tag)),
+      )
+
+      toast({
+        title: "Success",
+        description: "Tag updated successfully",
+      })
+    },
+    [tags, toast],
+  )
+
+  const deleteTag = useCallback(
+    (id: string) => {
+      setTags((prev) => prev.filter((tag) => tag.id !== id))
+      toast({
+        title: "Success",
+        description: "Tag deleted successfully",
+      })
+    },
+    [toast],
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   )
 
   const getTagById = useCallback(
@@ -268,7 +386,10 @@ export function TagsProvider({ children }: { children: React.ReactNode }) {
 
   const value: TagsContextType = {
     tags,
+<<<<<<< HEAD
     isLoading,
+=======
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     addTag,
     updateTag,
     deleteTag,

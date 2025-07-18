@@ -46,6 +46,7 @@ export function CategoryForm({ dictionary, lang, category, onSuccess, onCancel }
     setIsSubmitting(true)
     try {
       if (category) {
+<<<<<<< HEAD
         await updateCategory(category.id, data)
       } else {
         // Create new category with proper structure
@@ -56,6 +57,12 @@ export function CategoryForm({ dictionary, lang, category, onSuccess, onCancel }
         })
       }
       form.reset()
+=======
+        updateCategory(category.id, data)
+      } else {
+        addCategory({ ...data, isDefault: false })
+      }
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
       onSuccess?.()
     } catch (error) {
       console.error("Error saving category:", error)

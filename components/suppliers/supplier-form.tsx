@@ -17,9 +17,15 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   phone: z.string().optional(),
   address: z.string().optional(),
+<<<<<<< HEAD
   contact_person: z.string().optional(), // Changed to snake_case
   notes: z.string().optional(),
   is_active: z.boolean().default(true),
+=======
+  contactPerson: z.string().optional(),
+  notes: z.string().optional(),
+  isActive: z.boolean().default(true),
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -44,9 +50,15 @@ export function SupplierForm({ dictionary, lang, supplier, onSuccess, onCancel }
       email: supplier?.email || "",
       phone: supplier?.phone || "",
       address: supplier?.address || "",
+<<<<<<< HEAD
       contact_person: supplier?.contact_person || "", // Changed to snake_case
       notes: supplier?.notes || "",
       is_active: supplier?.is_active ?? true,
+=======
+      contactPerson: supplier?.contactPerson || "",
+      notes: supplier?.notes || "",
+      isActive: supplier?.isActive ?? true,
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     },
   })
 
@@ -54,9 +66,15 @@ export function SupplierForm({ dictionary, lang, supplier, onSuccess, onCancel }
     setIsSubmitting(true)
     try {
       if (supplier) {
+<<<<<<< HEAD
         await updateSupplier(supplier.id, data)
       } else {
         await addSupplier(data)
+=======
+        updateSupplier(supplier.id, data)
+      } else {
+        addSupplier(data)
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
       }
       onSuccess?.()
     } catch (error) {
@@ -87,7 +105,11 @@ export function SupplierForm({ dictionary, lang, supplier, onSuccess, onCancel }
 
             <FormField
               control={form.control}
+<<<<<<< HEAD
               name="contact_person" // Changed to snake_case
+=======
+              name="contactPerson"
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Contact Person</FormLabel>
@@ -177,7 +199,11 @@ export function SupplierForm({ dictionary, lang, supplier, onSuccess, onCancel }
 
           <FormField
             control={form.control}
+<<<<<<< HEAD
             name="is_active"
+=======
+            name="isActive"
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">

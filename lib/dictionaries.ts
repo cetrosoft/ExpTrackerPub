@@ -1,4 +1,5 @@
 const dictionaries = {
+<<<<<<< HEAD
   en: () => import("@/dictionaries/en.json").then((module) => module.default),
   ar: () => import("@/dictionaries/ar.json").then((module) => module.default),
   hi: () => import("@/dictionaries/hi.json").then((module) => module.default),
@@ -65,4 +66,14 @@ export const getDictionary = async (locale: string) => {
       },
     }
   }
+=======
+  en: () => import("../dictionaries/en.json").then((module) => module.default),
+  ar: () => import("../dictionaries/ar.json").then((module) => module.default),
+  hi: () => import("../dictionaries/hi.json").then((module) => module.default),
+}
+
+export const getDictionary = async (locale: string) => {
+  const dict = dictionaries[locale as keyof typeof dictionaries]
+  return dict ? await dict() : await dictionaries.en()
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 }

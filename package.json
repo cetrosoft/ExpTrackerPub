@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+<<<<<<< HEAD
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -10,6 +11,16 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
+=======
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "next lint",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@formatjs/intl-localematcher": "latest",
+    "@hookform/resolvers": "latest",
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
@@ -18,7 +29,11 @@
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-label": "^2.0.2",
+<<<<<<< HEAD
     "@radix-ui/react-popover": "^1.0.7",
+=======
+    "@radix-ui/react-popover": "latest",
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     "@radix-ui/react-progress": "^1.0.3",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-separator": "^1.0.3",
@@ -27,6 +42,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
+<<<<<<< HEAD
     "@supabase/supabase-js": "^2.39.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
@@ -50,12 +66,43 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+=======
+    "@supabase/supabase-js": "latest",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^0.2.0",
+    "cors": "latest",
+    "date-fns": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "lucide-react": "^0.454.0",
+    "negotiator": "latest",
+    "next": "14.2.16",
+    "next-themes": "latest",
+    "papaparse": "^5.4.1",
+    "pg": "latest",
+    "pg-native": "latest",
+    "react": "^18",
+    "react-day-picker": "latest",
+    "react-dom": "^18",
+    "react-hook-form": "latest",
+    "recharts": "latest",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7",
+    "uuid": "latest",
+    "xlsx": "latest",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
+<<<<<<< HEAD
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
@@ -69,3 +116,10 @@
     }
   }
 }
+=======
+    "postcss": "^8.5",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  }
+}
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d

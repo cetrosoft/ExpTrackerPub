@@ -1,8 +1,14 @@
 "use client"
 
+<<<<<<< HEAD
 import { useAuth } from "@/contexts/auth-context"
 import { useProfile } from "@/contexts/profile-context"
 import { useRouter, usePathname } from "next/navigation"
+=======
+import { useState } from "react"
+import { useAuth } from "@/contexts/auth-context"
+import { Button } from "@/components/ui/button"
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+<<<<<<< HEAD
 import { Button } from "@/components/ui/button"
 import { User, Settings, LogOut, Globe, UserCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
@@ -63,27 +70,61 @@ export function UserMenu() {
       </div>
     )
   }
+=======
+import { User, Settings, LogOut } from "lucide-react"
+
+export function UserMenu() {
+  const { user, signOut } = useAuth()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSignOut = async () => {
+    setIsLoading(true)
+    try {
+      await signOut()
+    } catch (error) {
+      console.error("Error signing out:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (!user) return null
+
+  const userInitials = user.email?.charAt(0).toUpperCase() || "U"
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
+<<<<<<< HEAD
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
             <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || ""} />
             <AvatarFallback>
               <User className="h-5 w-5" />
             </AvatarFallback>
+=======
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user.user_metadata?.avatar_url || "/placeholder.svg"} alt={user.email || ""} />
+            <AvatarFallback>{userInitials}</AvatarFallback>
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
+<<<<<<< HEAD
             <p className="text-sm font-medium leading-none">{profile?.full_name || "User"}</p>
+=======
+            <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || "User"}</p>
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+<<<<<<< HEAD
 
         <DropdownMenuItem onClick={() => router.push(`/${lang}/profile`)}>
           <UserCircle className="mr-2 h-4 w-4" />
@@ -119,6 +160,20 @@ export function UserMenu() {
         <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
+=======
+        <DropdownMenuItem>
+          <User className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Settings</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSignOut} disabled={isLoading}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>{isLoading ? "Signing out..." : "Sign out"}</span>
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
+<<<<<<< HEAD
   LayoutDashboard,
   CreditCard,
   BarChart2,
@@ -15,6 +16,24 @@ import {
   Target,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+=======
+  Home,
+  Receipt,
+  Tag,
+  Store,
+  CreditCard,
+  Settings,
+  Menu,
+  X,
+  PieChart,
+  FileBarChart,
+  Target,
+  Package,
+} from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { useState } from "react"
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 
 interface SidebarProps {
   dictionary: any
@@ -23,6 +42,7 @@ interface SidebarProps {
 
 export function Sidebar({ dictionary, lang }: SidebarProps) {
   const pathname = usePathname()
+<<<<<<< HEAD
 
   const isActive = (path: string) => {
     return pathname === `/${lang}${path}`
@@ -77,10 +97,65 @@ export function Sidebar({ dictionary, lang }: SidebarProps) {
     {
       name: "Settings",
       href: "/settings",
+=======
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const isRtl = lang === "ar"
+
+  const routes = [
+    {
+      name: dictionary.sidebar?.dashboard || "Dashboard",
+      href: `/${lang}`,
+      icon: Home,
+    },
+    {
+      name: dictionary.sidebar?.expenses || "Expenses",
+      href: `/${lang}/expenses`,
+      icon: Receipt,
+    },
+    {
+      name: dictionary.sidebar?.budgets || "Budgets",
+      href: `/${lang}/budgets`,
+      icon: Target,
+    },
+    {
+      name: dictionary.sidebar?.categories || "Categories",
+      href: `/${lang}/categories`,
+      icon: Package,
+    },
+    {
+      name: dictionary.sidebar?.tags || "Tags",
+      href: `/${lang}/tags`,
+      icon: Tag,
+    },
+    {
+      name: dictionary.sidebar?.suppliers || "Suppliers",
+      href: `/${lang}/suppliers`,
+      icon: Store,
+    },
+    {
+      name: dictionary.sidebar?.currencies || "Currencies",
+      href: `/${lang}/currencies`,
+      icon: CreditCard,
+    },
+    {
+      name: dictionary.sidebar?.analytics || "Analytics",
+      href: `/${lang}/analytics`,
+      icon: PieChart,
+    },
+    {
+      name: dictionary.sidebar?.reports || "Reports",
+      href: `/${lang}/reports`,
+      icon: FileBarChart,
+    },
+    {
+      name: dictionary.sidebar?.settings || "Settings",
+      href: `/${lang}/settings`,
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
       icon: Settings,
     },
   ]
 
+<<<<<<< HEAD
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
       <div className="p-6 border-b border-gray-200">
@@ -117,5 +192,73 @@ export function Sidebar({ dictionary, lang }: SidebarProps) {
         <p className="text-xs text-gray-500 text-center">© 2025 ExpenseTracker</p>
       </div>
     </div>
+=======
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
+  return (
+    <>
+      {/* Mobile menu button */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <Button variant="outline" size="icon" onClick={toggleMobileMenu}>
+          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      {/* Sidebar for mobile and desktop */}
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r transform transition-transform duration-200 ease-in-out md:translate-x-0",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+          isRtl && "left-auto right-0",
+          isRtl && isMobileMenuOpen ? "translate-x-0" : isRtl && "-translate-x-full",
+        )}
+      >
+        <div className="flex flex-col h-full">
+          <div className="p-4 border-b">
+            <h1 className="text-xl font-bold">Expense Tracker</h1>
+          </div>
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            {routes.map((route) => {
+              const isActive = pathname === route.href || pathname.startsWith(`${route.href}/`)
+              return (
+                <Link
+                  key={route.href}
+                  href={route.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                    isRtl && "flex-row-reverse text-right",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <route.icon className="h-5 w-5" />
+                  <span>{route.name}</span>
+                </Link>
+              )
+            })}
+          </nav>
+          <div className="p-4 border-t">
+            <div className="text-xs text-muted-foreground">
+              <p>© 2023 Expense Tracker</p>
+              <p>v1.0.0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+    </>
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   )
 }

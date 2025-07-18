@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 // IndexedDB service for offline storage
 
+=======
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
 export interface Expense {
   id: string
   title: string
   amount: number
+<<<<<<< HEAD
   category: string
   tags: string[]
   date: string
@@ -42,6 +46,55 @@ class IndexedDBService {
 
       request.onsuccess = (event) => {
         this.db = (event.target as IDBOpenDBRequest).result
+=======
+  category_id: string
+  currency_code: string
+  date: string
+  description?: string
+  tags: string[]
+  supplier_id?: string
+  user_id: string
+  created_at: string
+  updated_at: string
+}
+
+export interface Category {
+  id: string
+  name: string
+  color: string
+  icon: string
+  is_default: boolean
+  user_id?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface Currency {
+  id: string
+  code: string
+  name: string
+  symbol: string
+  exchange_rate: number
+  is_default: boolean
+  is_active: boolean
+  user_id?: string
+  created_at: string
+  updated_at: string
+}
+
+class IndexedDBService {
+  private dbName = "ExpenseTrackerDB"
+  private version = 1
+  private db: IDBDatabase | null = null
+
+  async init(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.dbName, this.version)
+
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => {
+        this.db = request.result
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
         resolve()
       }
 
@@ -50,6 +103,7 @@ class IndexedDBService {
 
         // Create expenses store
         if (!db.objectStoreNames.contains("expenses")) {
+<<<<<<< HEAD
           const expensesStore = db.createObjectStore("expenses", { keyPath: "id" })
           expensesStore.createIndex("date", "date", { unique: false })
           expensesStore.createIndex("category", "category", { unique: false })
@@ -61,11 +115,29 @@ class IndexedDBService {
           const syncQueueStore = db.createObjectStore("syncQueue", { keyPath: "id" })
           syncQueueStore.createIndex("timestamp", "timestamp", { unique: false })
           syncQueueStore.createIndex("entity", "entity", { unique: false })
+=======
+          const expenseStore = db.createObjectStore("expenses", { keyPath: "id" })
+          expenseStore.createIndex("user_id", "user_id", { unique: false })
+          expenseStore.createIndex("date", "date", { unique: false })
+        }
+
+        // Create categories store
+        if (!db.objectStoreNames.contains("categories")) {
+          const categoryStore = db.createObjectStore("categories", { keyPath: "id" })
+          categoryStore.createIndex("user_id", "user_id", { unique: false })
+        }
+
+        // Create currencies store
+        if (!db.objectStoreNames.contains("currencies")) {
+          const currencyStore = db.createObjectStore("currencies", { keyPath: "id" })
+          currencyStore.createIndex("user_id", "user_id", { unique: false })
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
         }
       }
     })
   }
 
+<<<<<<< HEAD
   private async ensureDB(): Promise<IDBDatabase> {
     if (!this.db) {
       await this.initDB()
@@ -177,10 +249,37 @@ class IndexedDBService {
       request.onerror = () => {
         reject(new Error(`Error updating expense with id ${id}`))
       }
+=======
+  async addExpense(expense: Expense): Promise<void> {
+    if (!this.db) await this.init()
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(["expenses"], "readwrite")
+      const store = transaction.objectStore("expenses")
+      const request = store.add(expense)
+
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => resolve()
+    })
+  }
+
+  async getExpenses(userId: string): Promise<Expense[]> {
+    if (!this.db) await this.init()
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(["expenses"], "readonly")
+      const store = transaction.objectStore("expenses")
+      const index = store.index("user_id")
+      const request = index.getAll(userId)
+
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => resolve(request.result)
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     })
   }
 
   async deleteExpense(id: string): Promise<void> {
+<<<<<<< HEAD
     const db = await this.ensureDB()
     const expense = await this.getExpenseById(id)
 
@@ -281,10 +380,29 @@ class IndexedDBService {
       transaction.onerror = () => {
         reject(new Error("Error clearing all data"))
       }
+=======
+    if (!this.db) await this.init()
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(["expenses"], "readwrite")
+      const store = transaction.objectStore("expenses")
+      const request = store.delete(id)
+
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => resolve()
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
     })
   }
 }
 
+<<<<<<< HEAD
 // Create a singleton instance
 const indexedDBService = new IndexedDBService()
 export default indexedDBService
+=======
+const indexedDBService = new IndexedDBService()
+export default indexedDBService
+
+// Export types for compatibility
+export type { Expense, Category, Currency }
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { getDictionary } from "@/lib/dictionaries"
 import { DashboardProvider } from "@/contexts/dashboard-context"
 import { DashboardFilters } from "@/components/dashboard/filters"
@@ -49,5 +50,61 @@ export default async function DashboardPage({
         </div>
       </div>
     </DashboardProvider>
+=======
+"use client"
+
+import { useAuth } from "@/contexts/auth-context"
+import { Auth } from "@/components/auth"
+import { ExpenseForm } from "@/components/expense-form"
+import { ExpenseList } from "@/components/expense-list"
+import { useExpenses } from "@/hooks/use-expenses"
+import { Loader2 } from "lucide-react"
+
+export default function Home() {
+  const { user, loading } = useAuth()
+  const { expenses, categories, currencies, loading: dataLoading, addExpense, deleteExpense } = useExpenses(user)
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show login page if not authenticated
+  if (!user) {
+    return <Auth />
+  }
+
+  // Show main app if authenticated
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Expense Tracker</h1>
+            <p className="text-gray-600">Track and manage your expenses with ease</p>
+          </div>
+          <div className="text-sm text-gray-500">Welcome, {user.email}</div>
+        </div>
+
+        {dataLoading ? (
+          <div className="text-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading your data...</p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            <ExpenseForm categories={categories} currencies={currencies} onSubmit={addExpense} />
+            <ExpenseList expenses={expenses} categories={categories} currencies={currencies} onDelete={deleteExpense} />
+          </div>
+        )}
+      </div>
+    </div>
+>>>>>>> b7a0cd479aae39c6c69f0c81685a6c0d3d4e4e9d
   )
 }
